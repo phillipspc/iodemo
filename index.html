@@ -12,18 +12,23 @@
   </head>
   <body>
     <canvas id="canvas" width="300" height="300" data-controller="canvas"></canvas>
+    <div>
+      <h4>Game object</h4>
+    </div>
     <script>
       (() => {
         const application = Stimulus.Application.start()
 
         application.register("canvas", class extends Stimulus.Controller {
+          
           connect() {
+            this.PLAYER_SIZE = 25;
             this.canvas = this.element;
             this.ctx = canvas.getContext("2d");
             this.ctx.fillStyle = "#FF0000";
             this.x = 0
             this.y = 0
-            this.ctx.fillRect(this.x,this.y,150,75);
+            this.ctx.fillRect(this.x,this.y,this.PLAYER_SIZE,this.PLAYER_SIZE);
             this.speed = 5
 
             document.addEventListener("keydown", e => {
@@ -40,7 +45,6 @@
                 case "ArrowRight":
                   this.moveRectAndUpdate(this.speed, 0)
                   break;
-
                 default:
                   break;
               }
@@ -51,10 +55,8 @@
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
             this.x += xDiff
             this.y += yDiff
-            this.ctx.fillRect(this.x,this.y,150,75);
+            this.ctx.fillRect(this.x,this.y,this.PLAYER_SIZE,this.PLAYER_SIZE);
           }
-
-          // …
         })
       })()
     </script>
