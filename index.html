@@ -5,45 +5,56 @@
     <title></title>
     <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
     <style media="screen">
-      #canvas {
+      .canvas {
         background-color: black;
       }
     </style>
   </head>
-  <body>
-    <canvas id="canvas" width="300" height="300" data-controller="canvas"></canvas>
+  <body data-controller="game">
     <div>
       <h4>Game object</h4>
+      <p data-target="game.state"></p>
     </div>
     <script>
       (() => {
         const application = Stimulus.Application.start()
 
-        application.register("canvas", class extends Stimulus.Controller {
-          
+        application.register("game", class extends Stimulus.Controller {
+          static get targets() {
+            return [ "state" ]
+          }
+
           connect() {
-            this.PLAYER_SIZE = 25;
-            this.canvas = this.element;
-            this.ctx = canvas.getContext("2d");
-            this.ctx.fillStyle = "#FF0000";
-            this.x = 0
-            this.y = 0
-            this.ctx.fillRect(this.x,this.y,this.PLAYER_SIZE,this.PLAYER_SIZE);
-            this.speed = 5
+            this.state = {
+              1: { x: 0, y: 0 },
+              2: { x: 200, y: 200 }
+            }
 
             document.addEventListener("keydown", e => {
               switch (e.key) {
-                case "ArrowUp":
-                  this.moveRectAndUpdate(0, -this.speed)
+                case "w":
+                  this.movePlayerAndUpdate(1, 0, -1)
                   break;
-                case "ArrowDown":
-                  this.moveRectAndUpdate(0, this.speed)
+                case "a":
+                  this.movePlayerAndUpdate(1, -1, 0)
+                  break;
+                case "s":
+                  this.movePlayerAndUpdate(1, 0, 1)
+                  break;
+                case "d":
+                  this.movePlayerAndUpdate(1, 1, 0)
+                  break;
+                case "ArrowUp":
+                  this.movePlayerAndUpdate(2, 0, -1)
                   break;
                 case "ArrowLeft":
-                  this.moveRectAndUpdate(-this.speed, 0)
+                  this.movePlayerAndUpdate(2, -1, 0)
+                  break;
+                case "ArrowDown":
+                  this.movePlayerAndUpdate(2, 0, 1)
                   break;
                 case "ArrowRight":
-                  this.moveRectAndUpdate(this.speed, 0)
+                  this.movePlayerAndUpdate(2, 1, 0)
                   break;
                 default:
                   break;
@@ -51,11 +62,12 @@
             })
           }
 
-          moveRectAndUpdate(xDiff, yDiff) {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-            this.x += xDiff
-            this.y += yDiff
-            this.ctx.fillRect(this.x,this.y,this.PLAYER_SIZE,this.PLAYER_SIZE);
+          movePlayerAndUpdate(playerNum, xDiff, yDiff) {
+            this.state[playerNum] = {
+              x: this.state[playerNum].x += xDiff,
+              y: this.state[playerNum].y += yDiff
+            }
+            this.stateTarget.innerHTML = JSON.stringify(this.state)
           }
         })
       })()
