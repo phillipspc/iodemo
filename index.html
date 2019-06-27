@@ -15,46 +15,63 @@
       <h4>Game object</h4>
       <p data-target="game.state"></p>
     </div>
+    <div>
+      <canvas class="canvas" width="300" height="300" data-target="game.playerOne"></canvas>
+      <canvas class="canvas" width="300" height="300" data-target="game.playerTwo"></canvas>
+    </div>
     <script>
       (() => {
         const application = Stimulus.Application.start()
 
         application.register("game", class extends Stimulus.Controller {
           static get targets() {
-            return [ "state" ]
+            return [ "state", "playerOne", "playerTwo" ]
           }
 
           connect() {
             this.state = {
-              1: { x: 0, y: 0 },
-              2: { x: 200, y: 200 }
+              1: { x: 0, y: 0, color: "#FF0000", size: 25 },
+              2: { x: 200, y: 200, color: "#0000FF", size: 25 }
             }
+            this.stateTarget.innerHTML = JSON.stringify(this.state)
+
+            this.playerOne = this.playerOneTarget.getContext("2d");
+            this.playerTwo = this.playerTwoTarget.getContext("2d");
+
+            this.playerOne.fillStyle = this.state[1].color;
+            this.playerOne.fillRect(this.state[1].x,this.state[1].y,this.state[1].size,this.state[1].size);
+            this.playerOne.fillStyle = this.state[2].color;
+            this.playerOne.fillRect(this.state[2].x,this.state[2].y,this.state[2].size,this.state[2].size);
+            this.playerTwo.fillStyle = this.state[1].color;
+            this.playerTwo.fillRect(this.state[1].x,this.state[1].y,this.state[1].size,this.state[1].size);
+            this.playerTwo.fillStyle = this.state[2].color;
+            this.playerTwo.fillRect(this.state[2].x,this.state[2].y,this.state[2].size,this.state[2].size);
 
             document.addEventListener("keydown", e => {
               switch (e.key) {
                 case "w":
-                  this.movePlayerAndUpdate(1, 0, -1)
+                  this.updateState(1, 0, -1)
                   break;
                 case "a":
-                  this.movePlayerAndUpdate(1, -1, 0)
+                  this.updateState(1, -1, 0)
                   break;
                 case "s":
-                  this.movePlayerAndUpdate(1, 0, 1)
+                  this.updateState(1, 0, 1)
                   break;
                 case "d":
-                  this.movePlayerAndUpdate(1, 1, 0)
+                  this.updateState(1, 1, 0)
                   break;
                 case "ArrowUp":
-                  this.movePlayerAndUpdate(2, 0, -1)
+                  this.updateState(2, 0, -1)
                   break;
                 case "ArrowLeft":
-                  this.movePlayerAndUpdate(2, -1, 0)
+                  this.updateState(2, -1, 0)
                   break;
                 case "ArrowDown":
-                  this.movePlayerAndUpdate(2, 0, 1)
+                  this.updateState(2, 0, 1)
                   break;
                 case "ArrowRight":
-                  this.movePlayerAndUpdate(2, 1, 0)
+                  this.updateState(2, 1, 0)
                   break;
                 default:
                   break;
@@ -62,13 +79,31 @@
             })
           }
 
-          movePlayerAndUpdate(playerNum, xDiff, yDiff) {
+          updateState(playerNum, xDiff, yDiff) {
             this.state[playerNum] = {
               x: this.state[playerNum].x += xDiff,
-              y: this.state[playerNum].y += yDiff
+              y: this.state[playerNum].y += yDiff,
+              ...this.state[playerNum]
             }
             this.stateTarget.innerHTML = JSON.stringify(this.state)
+            this.updateCanvas(this.state)
           }
+
+          updateCanvas(state) {
+            this.playerOne.fillStyle = this.state[1].color;
+            this.playerOne.clearRect(0,0,this.playerOneTarget.width,this.playerOneTarget.height);
+            this.playerOne.fillRect(this.state[1].x,this.state[1].y,this.state[1].size,this.state[1].size);
+            this.playerOne.fillStyle = this.state[2].color;
+            this.playerOne.fillRect(this.state[2].x,this.state[2].y,this.state[2].size,this.state[2].size);
+            
+            this.playerTwo.fillStyle = this.state[1].color;
+            this.playerTwo.clearRect(0,0,this.playerTwoTarget.width,this.playerTwoTarget.height);
+            this.playerTwo.fillRect(this.state[1].x,this.state[1].y,this.state[1].size,this.state[1].size);
+            this.playerTwo.fillStyle = this.state[2].color;
+            this.playerTwo.fillRect(this.state[2].x,this.state[2].y,this.state[2].size,this.state[2].size);
+
+
+          } 
         })
       })()
     </script>
